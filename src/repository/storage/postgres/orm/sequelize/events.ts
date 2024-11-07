@@ -53,6 +53,9 @@ export default class EventSequelizeStorage {
   };
 
   public async createEvent(courtId: Event['courtId'], name: Event['name'], time: Event['time'], description?: Event['description']): Promise<Event>{
+    console.log('===============');
+    console.log(courtId);
+
     return await this.model.create({
       courtId,
       name,

@@ -36,6 +36,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/cookie@npm:^9.0.4":
+  version: 9.4.0
+  resolution: "@fastify/cookie@npm:9.4.0"
+  dependencies:
+    cookie-signature: ^1.1.0
+    fastify-plugin: ^4.0.0
+  checksum: cea22a03cc005468fc217da9d8e22b239e11ef7fea5f51189fa21ad0781baa430d9798eb72d51b74781be512b6b9e60bb2fc174c3e451e91584714cfb44fdfbf
+  languageName: node
+  linkType: hard
+
+"@fastify/cors@npm:^8.3.0":
+  version: 8.5.0
+  resolution: "@fastify/cors@npm:8.5.0"
+  dependencies:
+    fastify-plugin: ^4.0.0
+    mnemonist: 0.39.6
+  checksum: b8adf78fa0c1f2ecbffe644dfda148f57f7e9c3c815de3eb6fd90ff359486d372f275c696db3c4f6441b0864e7427c1b7d8a307582a31925bddf21087a943c18
+  languageName: node
+  linkType: hard
+
 "@fastify/error@npm:^3.3.0, @fastify/error@npm:^3.4.0":
   version: 3.4.1
   resolution: "@fastify/error@npm:3.4.1"
@@ -58,6 +78,67 @@ __metadata:
   dependencies:
     fast-deep-equal: ^3.1.3
   checksum: d5b976f82e6d5d30a603345a29edb176a14866b98dd4d30aabe6e58a91dfc34fb1c2dd97289bdd7f4d1e11675c9dbb9382138968742d2ac8c6fdcc5f7bd08b97
+  languageName: node
+  linkType: hard
+
+"@fastify/oauth2@npm:^7.2.1":
+  version: 7.9.0
+  resolution: "@fastify/oauth2@npm:7.9.0"
+  dependencies:
+    "@fastify/cookie": ^9.0.4
+    fastify-plugin: ^4.5.1
+    simple-oauth2: ^5.0.0
+  checksum: be6637a572bb46a8d8bf29257b3d2db63f1135aed5c2cbf4ff18b3521a50a918af241c835144d8c370fa2714c52024d83fc3f1d0bee2edaeb7f607b5ea279edf
+  languageName: node
+  linkType: hard
+
+"@hapi/boom@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "@hapi/boom@npm:10.0.1"
+  dependencies:
+    "@hapi/hoek": ^11.0.2
+  checksum: c80f76e86386c65fb5e3f2aae489e82c318615b52c1462af913b1db3d05ebf1564336e2cd88f1ee79d66a8b6f48fa075089c617bfe93ad88e6e1a695d0cde499
+  languageName: node
+  linkType: hard
+
+"@hapi/bourne@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@hapi/bourne@npm:3.0.0"
+  checksum: 7174cab6c33191918fcdb1953fe3169a1106e6ac79a67ef5fd08b351f0813f8f608170f2239786cbe5519e03cdfe5ab748ea1635caa06dcd5802410295514ef8
+  languageName: node
+  linkType: hard
+
+"@hapi/hoek@npm:^11.0.2, @hapi/hoek@npm:^11.0.4":
+  version: 11.0.5
+  resolution: "@hapi/hoek@npm:11.0.5"
+  checksum: 330260089869fde705b4df2f4ebeabc24437a3424494563d94af2732f82dd0547ddbe0d2870c3ba88595a6998db597f38496ac402d5607328a91aabbad179ff6
+  languageName: node
+  linkType: hard
+
+"@hapi/hoek@npm:^9.0.0, @hapi/hoek@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "@hapi/hoek@npm:9.3.0"
+  checksum: 4771c7a776242c3c022b168046af4e324d116a9d2e1d60631ee64f474c6e38d1bb07092d898bf95c7bc5d334c5582798a1456321b2e53ca817d4e7c88bc25b43
+  languageName: node
+  linkType: hard
+
+"@hapi/topo@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@hapi/topo@npm:5.1.0"
+  dependencies:
+    "@hapi/hoek": ^9.0.0
+  checksum: 604dfd5dde76d5c334bd03f9001fce69c7ce529883acf92da96f4fe7e51221bf5e5110e964caca287a6a616ba027c071748ab636ff178ad750547fba611d6014
+  languageName: node
+  linkType: hard
+
+"@hapi/wreck@npm:^18.0.0":
+  version: 18.1.0
+  resolution: "@hapi/wreck@npm:18.1.0"
+  dependencies:
+    "@hapi/boom": ^10.0.1
+    "@hapi/bourne": ^3.0.0
+    "@hapi/hoek": ^11.0.2
+  checksum: 08e20e829a46fcdd1595b7181d3c0f94bc1cd2966aaf272138a6b80fa5266852295189295169903be20ef53bb35ba7b9a9080ce7e1147116ffce4db492b99bec
   languageName: node
   linkType: hard
 
@@ -152,6 +233,29 @@ __metadata:
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
   checksum: 6ad6a00fc4f2f2cfc6bff76fb1d88b8ee20bc0601e18ebb01b6d4be583733a860239a521a7fbca73b612e66705078809483549d2b18f370eb346c5155c8e4a0f
+  languageName: node
+  linkType: hard
+
+"@sideway/address@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "@sideway/address@npm:4.1.5"
+  dependencies:
+    "@hapi/hoek": ^9.0.0
+  checksum: 3e3ea0f00b4765d86509282290368a4a5fd39a7995fdc6de42116ca19a96120858e56c2c995081def06e1c53e1f8bccc7d013f6326602bec9d56b72ee2772b9d
+  languageName: node
+  linkType: hard
+
+"@sideway/formula@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@sideway/formula@npm:3.0.1"
+  checksum: e4beeebc9dbe2ff4ef0def15cec0165e00d1612e3d7cea0bc9ce5175c3263fc2c818b679bd558957f49400ee7be9d4e5ac90487e1625b4932e15c4aa7919c57a
+  languageName: node
+  linkType: hard
+
+"@sideway/pinpoint@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@sideway/pinpoint@npm:2.0.0"
+  checksum: 0f4491e5897fcf5bf02c46f5c359c56a314e90ba243f42f0c100437935daa2488f20482f0f77186bd6bf43345095a95d8143ecf8b1f4d876a7bc0806aba9c3d2
   languageName: node
   linkType: hard
 
@@ -579,6 +683,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie-signature@npm:^1.1.0":
+  version: 1.2.1
+  resolution: "cookie-signature@npm:1.2.1"
+  checksum: bb464aacac390b5d7d8ead2d6fff7c1c3b7378c7d0250921f48923fe889688e081ab33950448929db5f24d4f9f1506589a7ee1c685de8f12a3fdb30c49667ec5
+  languageName: node
+  linkType: hard
+
 "cookie@npm:^0.6.0":
   version: 0.6.0
   resolution: "cookie@npm:0.6.0"
@@ -821,6 +932,13 @@ __metadata:
   version: 2.3.0
   resolution: "fast-uri@npm:2.3.0"
   checksum: 92c8975a60cf0bb5344197559b1a89b8743b9ff9254aeea217d7df63606d79e8673a0d892eee7b953c4b62bf3b900b95cbfe64f0285dde41e7bd2f111123f48b
+  languageName: node
+  linkType: hard
+
+"fastify-plugin@npm:^4.0.0, fastify-plugin@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "fastify-plugin@npm:4.5.1"
+  checksum: ddd1b2d470c3acd9397c2617b5842dcf71a6f9a32f05d02be1c12e8d37b8fc03af656900cec38e2afef5e9a3dfe5f994317810f4c5e9960b127b1ca179b56f73
   languageName: node
   linkType: hard
 
@@ -1165,6 +1283,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"joi@npm:^17.6.4":
+  version: 17.13.3
+  resolution: "joi@npm:17.13.3"
+  dependencies:
+    "@hapi/hoek": ^9.3.0
+    "@hapi/topo": ^5.1.0
+    "@sideway/address": ^4.1.5
+    "@sideway/formula": ^3.0.1
+    "@sideway/pinpoint": ^2.0.0
+  checksum: 66ed454fee3d8e8da1ce21657fd2c7d565d98f3e539d2c5c028767e5f38cbd6297ce54df8312d1d094e62eb38f9452ebb43da4ce87321df66cf5e3f128cbc400
+  languageName: node
+  linkType: hard
+
 "joycon@npm:^3.1.1":
   version: 3.1.1
   resolution: "joycon@npm:3.1.1"
@@ -1503,6 +1634,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mnemonist@npm:0.39.6":
+  version: 0.39.6
+  resolution: "mnemonist@npm:0.39.6"
+  dependencies:
+    obliterator: ^2.0.1
+  checksum: 10cb09aa33de92625d5004f541e6aaaab8ae4bb26c6917e8505189f2fc20b122c773a4c11639bb6b5bfdc6000645c2d210ecd47fb203176fe28c338443c466eb
+  languageName: node
+  linkType: hard
+
 "moment-timezone@npm:^0.5.43":
   version: 0.5.45
   resolution: "moment-timezone@npm:0.5.45"
@@ -1622,6 +1762,13 @@ __metadata:
   version: 3.0.0
   resolution: "normalize-path@npm:3.0.0"
   checksum: 88eeb4da891e10b1318c4b2476b6e2ecbeb5ff97d946815ffea7794c31a89017c70d7f34b3c2ebf23ef4e9fc9fb99f7dffe36da22011b5b5c6ffa34f4873ec20
+  languageName: node
+  linkType: hard
+
+"obliterator@npm:^2.0.1":
+  version: 2.0.4
+  resolution: "obliterator@npm:2.0.4"
+  checksum: f28ad35b6d812089315f375dc3e6e5f9bebf958ebe4b10ccd471c7115cbcf595e74bdac4783ae758e5b1f47e3096427fdb37cfa7bed566b132df92ff317b9a7c
   languageName: node
   linkType: hard
 
@@ -1848,6 +1995,8 @@ __metadata:
   resolution: "ploshadka.api@workspace:."
   dependencies:
     "@codex-team/config-loader": ^1.0.0
+    "@fastify/cors": ^8.3.0
+    "@fastify/oauth2": ^7.2.1
     "@types/jsonwebtoken": ^9.0.2
     "@types/node": ^20.2.3
     arg: ^5.0.2
@@ -2205,6 +2354,18 @@ __metadata:
   version: 4.1.0
   resolution: "signal-exit@npm:4.1.0"
   checksum: 64c757b498cb8629ffa5f75485340594d2f8189e9b08700e69199069c8e3070fb3e255f7ab873c05dc0b3cec412aea7402e10a5990cb6a050bd33ba062a6c549
+  languageName: node
+  linkType: hard
+
+"simple-oauth2@npm:^5.0.0":
+  version: 5.1.0
+  resolution: "simple-oauth2@npm:5.1.0"
+  dependencies:
+    "@hapi/hoek": ^11.0.4
+    "@hapi/wreck": ^18.0.0
+    debug: ^4.3.4
+    joi: ^17.6.4
+  checksum: 65e07a92ffdfbc38fdd7db5480349b09c4c896559b6b3786a256546fe3aa6ac80086fa4f2c30d1d68ff551668147343c0a0dcc53c33fe7e5d1a7b42b4772eedc
   languageName: node
   linkType: hard
 

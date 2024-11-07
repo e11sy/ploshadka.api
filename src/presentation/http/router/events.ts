@@ -1,5 +1,5 @@
 import EventService from "@domain/service/events.js";
-import type { FastifyPluginCallback } from 'fastify';
+import type { FastifyPluginCallback, RawServerDefault } from 'fastify';
 import Event from "@domain/entities/event.js";
 
 interface EventsRouterOptions {
@@ -10,10 +10,45 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
   const eventService = opts.eventService;
 
   fastify.post<{
-    Body: Event;
+    Body: {
+      event: Event,
+    };
     Reply: Event | null;
-  }>('/', async (request, reply) => {
-    const { name, courtId, time, description } = request.body;
+  }>('/', {
+    schema: {
+      body: {
+        event: {
+          type: 'object',
+          required: [
+            'name',
+            'courtId',
+            'time',
+            'description',
+          ],
+          properties: {
+            name: {
+              type: 'string',
+            },
+            courtId: {
+              type: 'number',
+            },
+            time: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+            },
+            description: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    console.log('booooody', request.body, typeof request.body, request.body);
+
+    const { name, courtId, time, description } = request.body.event;
 
     const event = await eventService.createEvent(courtId, name, time, description);
 
@@ -24,7 +59,6 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
     Params: { name: Event['name'] },
     Reply: Event,
   }>('/:name', async ( request, reply ) => {
-    console.log('lalalallalalala', request.params);
     const name = request.params.name;
 
     const event = await eventService.getEventByName(name);
