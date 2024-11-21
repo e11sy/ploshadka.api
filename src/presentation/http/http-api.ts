@@ -3,12 +3,16 @@ import type Api from '@presentation/api.interface.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
+import cors from '@fastify/cors';
+import cookie from '@fastify/cookie';
+import { fastifyOauth2 } from '@fastify/oauth2';
 import { notFound, forbidden, unauthorized, notAcceptable, domainError } from './decorators/index.js';
 import type { DomainServices } from '@domain/index.js';
 import AuthRouter from '@presentation/http/router/auth.js';
 import UserRouter from './router/user.js';
 import OauthRouter from './router/oauth.js';
 import EventsRouter from './router/events.js';
+import addUserIdResolver from './middleware/common/userIdResolver.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -24,6 +28,11 @@ export default class HttpApi implements Api {
     this.server = fastify({logger: appServerLogger as FastifyBaseLogger});
 
     this.addDecorators();
+
+    await this.addCookies();
+    await this.addOauth2();
+    await this.addCORS();
+    this.addCommonMiddlewares(domainServices);
 
     await this.addApiRoutes(domainServices);
   }
@@ -72,13 +81,60 @@ export default class HttpApi implements Api {
   }
 
   /**
-  * Add custom decorators
-  */
-    private addDecorators(): void {
-      this.server?.decorateReply('notFound', notFound);
-      this.server?.decorateReply('forbidden', forbidden);
-      this.server?.decorateReply('unauthorized', unauthorized);
-      this.server?.decorateReply('notAcceptable', notAcceptable);
-      this.server?.decorateReply('domainError', domainError);
+   * Add custom decorators
+   */
+  private addDecorators(): void {
+    this.server?.decorateReply('notFound', notFound);
+    this.server?.decorateReply('forbidden', forbidden);
+    this.server?.decorateReply('unauthorized', unauthorized);
+    this.server?.decorateReply('notAcceptable', notAcceptable);
+    this.server?.decorateReply('domainError', domainError);
+  }
+  /**
+   * Registers oauth2 plugin
+   */
+  private async addOauth2(): Promise<void> {
+    await this.server?.register(fastifyOauth2, {
+      name: 'googleOAuth2',
+      scope: ['profile', 'email'],
+      credentials: {
+        client: {
+          id: this.config.oauth2.google.clientId,
+          secret: this.config.oauth2.google.clientSecret,
+        },
+        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+      },
+      startRedirectPath: this.config.oauth2.google.redirectUrl,
+      callbackUri: this.config.oauth2.google.callbackUrl,
+    });
+  }
+
+  /**
+   * Allows cors for allowed origins from config
+   */
+  private async addCORS(): Promise<void> {
+    await this.server?.register(cors, {
+      origin: this.config.allowedOrigins,
+    });
+  }
+  /**
+   * Add middlewares
+   * @param domainServices - instances of domain services
+   */
+  private addCommonMiddlewares(domainServices: DomainServices): void {
+    if (this.server === undefined) {
+      throw new Error('Server is not initialized');
     }
+
+    addUserIdResolver(this.server, domainServices.authService, appServerLogger);
+  }
+
+  /**
+   * Adds support for reading and setting cookies
+   */
+  private async addCookies(): Promise<void> {
+    await this.server?.register(cookie, {
+      secret: this.config.cookieSecret,
+    });
+  }
 }

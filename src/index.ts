@@ -17,7 +17,7 @@ const start = async (): Promise<void> => {
     await api.init(domainServices);
     await api.run();
 
-    logger.info('Application launched successfully');
+    logger.info('Application launched succcessfully');
   } catch (err) {
     logger.fatal('Failed to start application ' + err);
     process.exit(1);
