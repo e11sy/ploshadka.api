@@ -1,7 +1,7 @@
 import { loadConfig } from '@codex-team/config-loader';
 import * as process from 'process';
+import * as path from 'path';
 import arg from 'arg';
-import path from 'path';
 import { z } from 'zod';
 
 /**
@@ -125,17 +125,17 @@ const defaultConfig: AppConfig = {
     database: 'info',
   },
   database: {
-    dsn: 'postgres://user:pass@postgres/ploshadka',
+    dsn: 'postgres://postgres:postgres@postgres/ploshadka',
   },
 };
 
-const args = arg({ /* eslint-disable @typescript-eslint/naming-convention */
+const args = arg({
   '--config': [ String ],
   '-c': '--config',
 });
 
 const cwd = process.cwd();
-const paths = (args['--config'] || [ './app-config.yaml' ]).map((configPath) => {
+const paths = (args['--config'] || [ './app-config.local.yaml' ]).map((configPath) => {
   if (path.isAbsolute(configPath)) {
     return configPath;
   }
