@@ -29,4 +29,4 @@ logging:
   database: info
 
 database:
-  dsn: 'postgres://postgres:Egoramurin1@localhost:5432/ploshadka'
+  dsn: 'postgres://user:pass@localhost:5432/ploshadka'
