@@ -42,7 +42,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   /**
    * Create storage instances
    */
-  const eventStorage = new  EventStorage(orm);
+  const eventStorage = new EventStorage(orm);
   const userStorage = new UserStorage(orm)
   const userSessionsStorage = new UserSessionStorage(orm);
 

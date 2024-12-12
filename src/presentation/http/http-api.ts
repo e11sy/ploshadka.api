@@ -3,6 +3,9 @@ import type Api from '@presentation/api.interface.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
+import cors from '@fastify/cors';
+import cookie from '@fastify/cookie';
+import { fastifyOauth2 } from '@fastify/oauth2';
 import { notFound, forbidden, unauthorized, notAcceptable, domainError } from './decorators/index.js';
 import type { DomainServices } from '@domain/index.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -27,6 +30,10 @@ export default class HttpApi implements Api {
     this.server = fastify({logger: appServerLogger as FastifyBaseLogger});
 
     this.addDecorators();
+
+    await this.addCookies();
+    await this.addOauth2();
+    await this.addCORS();
     this.addCommonMiddlewares(domainServices);
     this.addPoliciesCheckHook(domainServices);
 
@@ -86,7 +93,33 @@ export default class HttpApi implements Api {
     this.server?.decorateReply('notAcceptable', notAcceptable);
     this.server?.decorateReply('domainError', domainError);
   }
+  /**
+   * Registers oauth2 plugin
+   */
+  private async addOauth2(): Promise<void> {
+    await this.server?.register(fastifyOauth2, {
+      name: 'googleOAuth2',
+      scope: ['profile', 'email'],
+      credentials: {
+        client: {
+          id: this.config.oauth2.google.clientId,
+          secret: this.config.oauth2.google.clientSecret,
+        },
+        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+      },
+      startRedirectPath: this.config.oauth2.google.redirectUrl,
+      callbackUri: this.config.oauth2.google.callbackUrl,
+    });
+  }
 
+  /**
+   * Allows cors for allowed origins from config
+   */
+  private async addCORS(): Promise<void> {
+    await this.server?.register(cors, {
+      origin: this.config.allowedOrigins,
+    });
+  }
   /**
    * Add middlewares
    * @param domainServices - instances of domain services
@@ -97,6 +130,15 @@ export default class HttpApi implements Api {
     }
 
     addUserIdResolver(this.server, domainServices.authService, appServerLogger);
+  }
+
+  /**
+   * Adds support for reading and setting cookies
+   */
+  private async addCookies(): Promise<void> {
+    await this.server?.register(cookie, {
+      secret: this.config.cookieSecret,
+    });
   }
 
   /**
