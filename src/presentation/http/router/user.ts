@@ -31,7 +31,11 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   fastify.get<{
     Reply: Pick<User, 'id' | 'name' | 'email' >,
   }>('/myself', {
-    config: {},
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
   }, async (request, reply) => {
     const userId = request.userId as number;
 

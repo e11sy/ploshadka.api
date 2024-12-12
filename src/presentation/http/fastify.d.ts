@@ -38,7 +38,7 @@ declare module 'fastify' {
     //  *      // ...
     //  *    })
     //  */
-    // policy?: Array<keyof typeof Policies>;
+    policy?: Array<keyof typeof Policies>;
   }
 
   /**

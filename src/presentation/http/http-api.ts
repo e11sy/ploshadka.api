@@ -12,7 +12,9 @@ import AuthRouter from '@presentation/http/router/auth.js';
 import UserRouter from './router/user.js';
 import OauthRouter from './router/oauth.js';
 import EventsRouter from './router/events.js';
-import addUserIdResolver from './middleware/common/userIdResolver.js';
+import { RequestParams, Response } from '@presentation/api.interface.js';
+import Policies from './policies/index.js';
+import addUserIdResolver from './middlewares/common/userIdResolver.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -33,6 +35,7 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
     this.addCommonMiddlewares(domainServices);
+    this.addPoliciesCheckHook(domainServices);
 
     await this.addApiRoutes(domainServices);
   }
@@ -136,5 +139,57 @@ export default class HttpApi implements Api {
     await this.server?.register(cookie, {
       secret: this.config.cookieSecret,
     });
+  }
+
+  /**
+   * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
+   * @param domainServices - instances of domain services
+   */
+  private addPoliciesCheckHook(domainServices: DomainServices): void {
+    this.server?.addHook('onRoute', (routeOptions) => {
+      const policies = routeOptions.config?.policy ?? [];
+
+      if (policies.length === 0) {
+        return;
+      }
+
+      /**
+       * Save original route preHandler(s) if exists
+       */
+      if (routeOptions.preHandler === undefined) {
+        routeOptions.preHandler = [];
+      } else if (!Array.isArray(routeOptions.preHandler)) {
+        routeOptions.preHandler = [routeOptions.preHandler];
+      }
+
+      routeOptions.preHandler.push(async (request, reply) => {
+        for (const policy of policies) {
+          const policyFunction = Policies[policy as keyof typeof Policies];
+          if (policyFunction) {
+            await policyFunction({ request, reply, domainServices });
+          }
+        }
+      });
+    });
+  }
+
+  /**
+   * Performs fake request to API routes.
+   * Used for API testing
+   * @param params - request options
+   */
+  public async fakeRequest(params: RequestParams): Promise<Response | undefined> {
+    const response = await this.server?.inject(params);
+
+    if (response === undefined) {
+      return;
+    }
+
+    return {
+      statusCode: response.statusCode,
+      body: response.body,
+      headers: response.headers,
+      json: response.json,
+    };
   }
 }
