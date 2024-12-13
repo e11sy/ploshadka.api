@@ -8,8 +8,15 @@ export default class EventsRepository {
     this.storage = storage;
   }
 
-  public async createEvent(courtId: Event['courtId'], name: Event['name'], time: Event['time'], description?: Event['description']): Promise<Event> {
-    return await this.storage.createEvent(courtId, name, time, description);
+  public async createEvent(
+    courtId: Event['courtId'],
+    name: Event['name'],
+    peopleState: Event['peopleState'],
+    sport: Event['sport'],
+    description?: Event['description'],
+    visited?: Event['visited'],
+  ): Promise<Event> {
+    return await this.storage.createEvent(courtId, name, peopleState, sport,  description, visited);
   }
 
   public async getEventByName(name: Event['name']): Promise<Event | null>{
@@ -18,5 +25,13 @@ export default class EventsRepository {
 
   public async getEventsByCourtId(courtId: Event['courtId']): Promise<Event[]> {
     return await this.storage.getEventsByCourtId(courtId);
+  }
+
+  public async getEventBySport(sport: Event['sport']): Promise<Event[] | null> {
+    return await this.storage.getEventBySport(sport);
+  }
+
+  public async getMyEvents(): Promise<Event[]> {
+    return await this.storage.getMyEvents();
   }
 }

@@ -13,7 +13,11 @@ export class EventsModel extends Model<InferAttributes<EventsModel>, InferCreati
 
   public declare description: CreationOptional<Event['description']>;
 
-  public declare time: Event['time'];
+  public declare peopleState: Event['peopleState'];
+
+  public declare sport: Event['sport'];
+
+  public declare visited: boolean;
 }
 
 export default class EventSequelizeStorage {
@@ -43,24 +47,39 @@ export default class EventSequelizeStorage {
       description: {
         type: DataTypes.STRING,
       },
-      time: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+      peopleState: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+      },
+      sport: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      visited: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     }, {
       tableName: this.tableName,
+      timestamps: false,
       sequelize: this.database,
     });
   };
 
-  public async createEvent(courtId: Event['courtId'], name: Event['name'], time: Event['time'], description?: Event['description']): Promise<Event>{
-    console.log('===============');
-    console.log(courtId);
-
+  public async createEvent(
+    courtId: Event['courtId'],
+    name: Event['name'],
+    peopleState: Event['peopleState'],
+    sport: Event['sport'],
+    description?: Event['description'],
+    visited?: Event['visited'],
+  ): Promise<Event>{
     return await this.model.create({
       courtId,
       name,
-      time,
+      peopleState,
       description,
+      sport,
+      visited: visited ?? false,
     });
   }
 
@@ -76,6 +95,26 @@ export default class EventSequelizeStorage {
     const events = await this.model.findAll({
       where: {
         courtId,
+      }
+    });
+
+    return events ?? [];
+  }
+
+  public async getEventBySport(sport: Event['sport']): Promise<Event[] | null> {
+    const events = await this.model.findAll({
+      where: {
+        sport: sport,
+      }
+    });
+
+    return events ?? [];
+  }
+
+  public async getMyEvents(): Promise<Event[]> {
+    const events = await this.model.findAll({
+      where: {
+        visited: true,
       }
     });
 

@@ -22,7 +22,7 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
           required: [
             'name',
             'courtId',
-            'time',
+            'peopleState',
             'description',
           ],
           properties: {
@@ -32,10 +32,10 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
             courtId: {
               type: 'number',
             },
-            time: {
+            peopleState: {
               type: 'array',
               items: {
-                type: 'string',
+                type: 'number',
               },
             },
             description: {
@@ -48,9 +48,9 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
   }, async (request, reply) => {
     console.log('booooody', request.body, typeof request.body, request.body);
 
-    const { name, courtId, time, description } = request.body.event;
+    const { name, courtId, peopleState, description } = request.body.event;
 
-    const event = await eventService.createEvent(courtId, name, time, description);
+    const event = await eventService.createEvent(courtId, name, peopleState, description);
 
     return reply.send(event)
   })
@@ -58,7 +58,7 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
   fastify.get<{
     Params: { name: Event['name'] },
     Reply: Event,
-  }>('/:name', async ( request, reply ) => {
+  }>('/name/:name', async ( request, reply ) => {
     const name = request.params.name;
 
     const event = await eventService.getEventByName(name);
@@ -69,6 +69,29 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
 
     return reply.send(event);
   })
+
+  fastify.get<{
+    Params: { sport: Event['sport'] },
+    Reply: Event[],
+  }>('/sport/:sport', async ( request, reply ) => {
+    const sport = decodeURIComponent(request.params.sport);
+
+    const event = await eventService.getEventBySport(sport);
+
+    if (event === null) {
+      return reply.notFound('No events for this kind of sport');
+    }
+
+    return reply.send(event);
+  })
+
+  fastify.get<{
+    Reply: Event[],
+  }>('/my', async ( _request, reply ) => {
+    const events = await eventService.getMyEvents();
+
+    return reply.send(events);
+  });
 
   fastify.get<{
     Params: { courtId: Event['courtId']},

@@ -22,7 +22,17 @@ export default interface Event {
     description: string,
 
     /**
-     * Array of timestamps without timezone (start and end of event)
+     * Sport type
      */
-    time: [string, string]
+    sport: string,
+
+    /**
+     * How many people already participate in the event and how many people can participate
+     */
+    peopleState: [number, number],
+
+    /**
+     * Flag to mark event as visited or planned to visit
+     */
+    visited: boolean,
 }
