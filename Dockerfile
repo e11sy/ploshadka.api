@@ -19,7 +19,7 @@ COPY --from=builder /app/dist ./dist
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn/releases ./.yarn/releases
 RUN yarn install
-COPY ./app-config.yaml .
+COPY ./app-config.local.yaml .
 COPY ./init.sh .
 
 USER node
