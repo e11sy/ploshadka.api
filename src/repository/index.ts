@@ -4,9 +4,13 @@ import GoogleApiTransport from '@repository/transport/google-api/index.js';
 import EventsRepository from '@repository/events.repository.js';
 import UserSessionRepository from '@repository/userSession.repository.js';
 import UserRepository from '@repository/user.repository.js';
+import CourtsRepository from './courts.repository.js';
+
 import UserSessionStorage from './storage/userSession.storage.js';
 import UserStorage from './storage/user.storage.js';
 import EventStorage from './storage/events.storage.js';
+import EventVisitsStorage from './storage/eventVisits.storage.js';
+import CourtsStorage from './storage/courts.storage.js';
 
 export interface Repositories {
   eventsRepository: EventsRepository;
@@ -14,6 +18,8 @@ export interface Repositories {
   userSessionRepository: UserSessionRepository,
 
   userRepository: UserRepository;
+
+  courtsRepository: CourtsRepository;
 }
 
 /**
@@ -45,10 +51,19 @@ export async function init(orm: Orm): Promise<Repositories> {
   const eventStorage = new EventStorage(orm);
   const userStorage = new UserStorage(orm)
   const userSessionsStorage = new UserSessionStorage(orm);
+  const eventVisitsStorage = new EventVisitsStorage(orm);
+  const courtsStorage = new CourtsStorage(orm);
+
+  /**
+   * Create model associations
+   */
+  await eventStorage.createAssociationWithCourtsModel(courtsStorage.model);
 
   await eventStorage.model.sync();
   await userStorage.model.sync();
   await userSessionsStorage.model.sync();
+  await eventVisitsStorage.model.sync();
+  await courtsStorage.model.sync();
 
 
   /**
@@ -56,14 +71,16 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const googleApiTransport = new GoogleApiTransport();
 
-  const eventsRepository = new EventsRepository(eventStorage);
+  const eventsRepository = new EventsRepository(eventStorage, eventVisitsStorage);
   const userSessionRepository = new UserSessionRepository(userSessionsStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
+  const courtsRepository = new CourtsRepository(courtsStorage);
 
   return {
     eventsRepository,
     userSessionRepository,
     userRepository,
+    courtsRepository,
   }
 }
 

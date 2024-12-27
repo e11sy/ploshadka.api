@@ -1,6 +1,6 @@
 import EventService from "@domain/service/events.js";
-import type { FastifyPluginCallback, RawServerDefault } from 'fastify';
-import Event from "@domain/entities/event.js";
+import type { FastifyPluginCallback } from 'fastify';
+import Event, { EventPresentation } from "@domain/entities/event.js";
 
 interface EventsRouterOptions {
   eventService: EventService;
@@ -22,8 +22,8 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
           required: [
             'name',
             'courtId',
-            'peopleState',
-            'description',
+            'peopleLimit',
+            'sport',
           ],
           properties: {
             name: {
@@ -32,13 +32,10 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
             courtId: {
               type: 'number',
             },
-            peopleState: {
-              type: 'array',
-              items: {
-                type: 'number',
-              },
+            peopleLimit: {
+              type: 'number',
             },
-            description: {
+            sport: {
               type: 'string',
             },
           },
@@ -46,11 +43,9 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
       },
     },
   }, async (request, reply) => {
-    console.log('booooody', request.body, typeof request.body, request.body);
+    const { name, courtId, peopleLimit, sport } = request.body.event;
 
-    const { name, courtId, peopleState, description } = request.body.event;
-
-    const event = await eventService.createEvent(courtId, name, peopleState, description);
+    const event = await eventService.createEvent(courtId, name, peopleLimit, sport);
 
     return reply.send(event)
   })
@@ -72,36 +67,78 @@ const EventsRouter: FastifyPluginCallback<EventsRouterOptions> = (fastify, opts,
 
   fastify.get<{
     Params: { sport: Event['sport'] },
-    Reply: Event[],
+    Reply: EventPresentation[],
   }>('/sport/:sport', async ( request, reply ) => {
+    const userId = request.userId as number;
+
     const sport = decodeURIComponent(request.params.sport);
 
-    const event = await eventService.getEventBySport(sport);
+    const events = await eventService.getEventsBySport(sport);
 
-    if (event === null) {
-      return reply.notFound('No events for this kind of sport');
+    if (userId !== undefined && userId !== null) {
+      for (const event of events) {
+        event.isParticipating = await eventService.checkEventParticipationStatus(event.id, userId);
+      }
     }
 
-    return reply.send(event);
+    return reply.send(events);
   })
 
   fastify.get<{
-    Reply: Event[],
-  }>('/my', async ( _request, reply ) => {
-    const events = await eventService.getMyEvents();
+    Params: { courtId: Event['courtId']},
+    Reply: EventPresentation[];
+  }>('/court/:courtId', async ( request, reply ) => {
+    const userId = request.userId as number;
+
+    const courtId = request.params.courtId;
+
+    const events = await eventService.getEventsByCourtId(courtId);
+
+    if (userId !== undefined && userId !== null) {
+      for (const event of events) {
+        event.isParticipating = await eventService.checkEventParticipationStatus(event.id, userId);
+      }
+    }
 
     return reply.send(events);
   });
 
   fastify.get<{
-    Params: { courtId: Event['courtId']},
-    Reply: Event[];
-  }>('/court/:courtId', async ( request, reply ) => {
-    const courtId = request.params.courtId;
+    Querystring: { courtIds: string },
+    Reply: EventPresentation[],
+  }>('/on-courts', async ( request, reply ) => {
+    const userId = request.userId as number;
 
-    const events = await eventService.getEventsByCourtId(courtId);
+    const courtIds = request.query.courtIds.split(',').map(Number);
+
+    const events = await eventService.getEventsOnCourts(courtIds);
+
+    if (userId !== undefined && userId !== null) {
+      for (const event of events) {
+        event.isParticipating = await eventService.checkEventParticipationStatus(event.id, userId);
+      }
+    }
 
     return reply.send(events);
+  });
+
+  fastify.patch<{
+    Body: { eventId: Event['id'] },
+    Reply: boolean
+  }>('/participation',{
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+  },
+  async ( request, reply ) => {
+    const eventId = request.body.eventId;
+    const userId = request.userId as number;
+
+    const success = await eventService.changeEventParticipationStatus(eventId, userId);
+
+    return reply.send(success);
   });
 
   done();

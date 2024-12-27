@@ -1,6 +1,6 @@
 import EventSequelizeStorage from "./postgres/orm/sequelize/events.js";
 
 /**
- * Current user sessions storage
+ * Current events storage
  */
 export default EventSequelizeStorage;

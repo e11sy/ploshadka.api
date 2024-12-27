@@ -1,37 +1,52 @@
-import EventsStorage from '@repository/storage/events.storage.js'
+import EventsStorage from '@repository/storage/events.storage.js';
+import EventVisitsStorage from '@repository/storage/eventVisits.storage.js';
 import Event from '@domain/entities/event.js';
 
 export default class EventsRepository {
-  public storage: EventsStorage;
+  private readonly eventStorage: EventsStorage;
 
-  constructor(storage: EventsStorage) {
-    this.storage = storage;
+  private readonly eventVisitsStorage: EventVisitsStorage;
+
+  constructor(eventStorage: EventsStorage, eventVisitsStorage: EventVisitsStorage) {
+    this.eventStorage = eventStorage;
+    this.eventVisitsStorage = eventVisitsStorage;
   }
 
   public async createEvent(
     courtId: Event['courtId'],
     name: Event['name'],
-    peopleState: Event['peopleState'],
+    peopleLimit: Event['peopleLimit'],
     sport: Event['sport'],
     description?: Event['description'],
-    visited?: Event['visited'],
   ): Promise<Event> {
-    return await this.storage.createEvent(courtId, name, peopleState, sport,  description, visited);
+    return await this.eventStorage.createEvent(courtId, name, peopleLimit, sport,  description);
   }
 
   public async getEventByName(name: Event['name']): Promise<Event | null>{
-    return await this.storage.getEventByName(name);
+    return await this.eventStorage.getEventByName(name);
   }
 
   public async getEventsByCourtId(courtId: Event['courtId']): Promise<Event[]> {
-    return await this.storage.getEventsByCourtId(courtId);
+    return await this.eventStorage.getEventsByCourtId(courtId);
   }
 
-  public async getEventBySport(sport: Event['sport']): Promise<Event[] | null> {
-    return await this.storage.getEventBySport(sport);
+  public async getEventsBySport(sport: Event['sport']): Promise<Event[] | null> {
+    return await this.eventStorage.getEventsBySport(sport);
   }
 
-  public async getMyEvents(): Promise<Event[]> {
-    return await this.storage.getMyEvents();
+  public async checkEventParticipationStatus(eventId: Event['id'], userId: Event['id']): Promise<boolean> {
+    return await this.eventVisitsStorage.checkEventParticipationStatus(eventId, userId);
+  }
+
+  public async changeEventParticipationStatus(eventId: Event['id'], userId: Event['id']): Promise<boolean> {
+    return await this.eventVisitsStorage.changeEventParticipationStatus(eventId, userId);
+  }
+
+  public async getEventParticipantsCount(eventId: Event['id']): Promise<number> {
+    return await this.eventVisitsStorage.getEventParticipantsCount(eventId);
+  }
+
+  public async getEventsOnCourts(courtIds: Event['courtId'][]): Promise<Event[]> {
+    return await this.eventStorage.getEventsOnCourts(courtIds);
   }
 }

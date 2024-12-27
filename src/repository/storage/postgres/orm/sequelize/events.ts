@@ -1,8 +1,10 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
+import { Op, where } from 'sequelize';
 import Event from "@domain/entities/event.js";
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-
+import { sequelize } from '../../export/initSequelize.js';
+import { CourtsModel } from './courts.js';
 
 export class EventsModel extends Model<InferAttributes<EventsModel>, InferCreationAttributes<EventsModel>> {
   public declare id : CreationOptional<number>;
@@ -13,15 +15,17 @@ export class EventsModel extends Model<InferAttributes<EventsModel>, InferCreati
 
   public declare description: CreationOptional<Event['description']>;
 
-  public declare peopleState: Event['peopleState'];
+  public declare peopleLimit: Event['peopleLimit'];
 
   public declare sport: Event['sport'];
 
-  public declare visited: boolean;
+  public declare expires_at: CreationOptional<Event['expires_at']>;
 }
 
 export default class EventSequelizeStorage {
   public model: typeof EventsModel;
+
+  public courtsModel: ModelStatic<CourtsModel> | undefined = undefined;
 
   private readonly database: Sequelize;
 
@@ -47,17 +51,17 @@ export default class EventSequelizeStorage {
       description: {
         type: DataTypes.STRING,
       },
-      peopleState: {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
+      peopleLimit: {
+        type: DataTypes.INTEGER,
       },
       sport: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      visited: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
+      expires_at: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP + INTERVAL \'1 DAY\''),
+      }
     }, {
       tableName: this.tableName,
       timestamps: false,
@@ -68,26 +72,47 @@ export default class EventSequelizeStorage {
   public async createEvent(
     courtId: Event['courtId'],
     name: Event['name'],
-    peopleState: Event['peopleState'],
+    peopleLimit: Event['peopleLimit'],
     sport: Event['sport'],
     description?: Event['description'],
-    visited?: Event['visited'],
+    expires_at?: Event['expires_at']
   ): Promise<Event>{
     return await this.model.create({
       courtId,
       name,
-      peopleState,
+      peopleLimit,
       description,
       sport,
-      visited: visited ?? false,
+      expires_at: expires_at ?? new Date(Date.now() + 1000 * 60 * 60 * 24),
     });
   }
 
-  public async getEventByName(name: Event['name']): Promise<Event | null>{
+  /**
+   * Creates association with user model
+   * @param model - initialized note settings model
+   */
+  public createAssociationWithCourtsModel(model: ModelStatic<CourtsModel>): void {
+    this.courtsModel = model;
+
+    this.model.belongsTo(this.courtsModel, {
+      foreignKey: 'courtId',
+      as: 'court',
+    });
+  }
+
+  public async getEventByName(name: Event['name']): Promise<Event | null> {
     return await this.model.findOne({
       where: {
         name,
-      }
+        expires_at: { [Op.gt]: new Date() }
+      },
+      include: [
+        {
+          model: this.courtsModel!,
+          as: 'court',
+          attributes: ['name']
+        },
+      ]
     })
   }
 
@@ -95,29 +120,59 @@ export default class EventSequelizeStorage {
     const events = await this.model.findAll({
       where: {
         courtId,
-      }
+        expires_at: { [Op.gt]: new Date() }
+      },
+      include: [
+        {
+          model: this.courtsModel!,
+          as: 'court',
+          attributes: ['name']
+        },
+      ]
     });
 
     return events ?? [];
   }
 
-  public async getEventBySport(sport: Event['sport']): Promise<Event[] | null> {
+  public async getEventsBySport(sport: Event['sport']): Promise<Event[] | null> {
     const events = await this.model.findAll({
       where: {
         sport: sport,
-      }
+        expires_at: { [Op.gt]: new Date() }
+      },
+      include: [
+        {
+          model: this.courtsModel!,
+          as: 'court',
+          attributes: ['name']
+        },
+      ]
     });
 
-    return events ?? [];
+    const plainEvents = events.map(event => event.get({ plain: true }));
+
+    return plainEvents ?? [];
   }
 
-  public async getMyEvents(): Promise<Event[]> {
-    const events = await this.model.findAll({
+  public async getEventsOnCourts(courtIds: Event['courtId'][]): Promise<Event[]> {
+    const events= await this.model.findAll({
       where: {
-        visited: true,
-      }
+        courtId: {
+          [Op.in]: courtIds
+        },
+        expires_at: { [Op.gt]: new Date() }
+      },
+      limit: 20,
+      raw: true,
+      nest: true,
+      include: [
+        {
+          model: this.courtsModel!,
+          as: 'court',
+        },
+      ]
     });
 
-    return events ?? [];
+    return events;
   }
 }

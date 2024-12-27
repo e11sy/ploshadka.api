@@ -37,8 +37,8 @@ export default class DatabaseHelpers {
    * Inserts user mock to then db
    * @param user - user object which contain all info about user
    *
-   * If name is not passed, it's value in database would be 'CodeX'
-   * If email is not passed, it's value in database would be 'test@codexmail.com'
+   * If name is not passed, it's value in database would be {random}
+   * If email is not passed, it's value in database would be '{random}@mail.com'
    * If editorTools is not passed, it's value in database would be []
    */
   public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
