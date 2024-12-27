@@ -37,7 +37,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    * Regenerate access end refresh tokens by refresh token
    */
   fastify.post<{
-    Body: string;
+    Body: {token: string};
     Reply: AuthSession | ErrorResponse;
   }>('/',
     {
@@ -54,7 +54,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     },
     async (request, reply) => {
 
-    const { token } = JSON.parse(request.body);
+    const { token } = request.body;
     // const { token } = request.body;
 
     const userSession = await opts.authService.verifyRefreshToken(token);
