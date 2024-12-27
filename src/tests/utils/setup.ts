@@ -1,21 +1,17 @@
-import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
-import type { StartedLocalStackContainer } from '@testcontainers/localstack';
-import { LocalstackContainer } from '@testcontainers/localstack';
 
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
-// import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate.js';
+import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate.js';
 import API from '@presentation/index.js';
 
 import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface.js';
 
 import DatabaseHelpers from './database-helpers.js';
-
-import process from 'process';
+import path from 'path';
 
 /**
  * Tests setup maximum duration.
@@ -46,6 +42,12 @@ declare global {
   var db: DatabaseHelpers;
 }
 
+/**
+ * Path to migrations files
+ */
+const migrationsPath = path.join(process.cwd(), 'migrations', 'tenant');
+
+
 let postgresContainer: StartedPostgreSqlContainer | undefined;
 
 beforeAll(async () => {
@@ -54,6 +56,9 @@ beforeAll(async () => {
     .start();
 
   const orm = await initORM({ dsn: postgresContainer.getConnectionUri() });
+
+  await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
+
   const repositories = await initRepositories(orm);
   const domainServices = initDomainServices(repositories, config);
   const api = new API(config.httpApi);
