@@ -15,14 +15,10 @@ export default function addUserIdResolver(server: FastifyInstance, authService: 
    */
   server.decorateRequest('userId', null);
 
-  console.log('resolver triggered');
   /**
    * Resolve userId from Access Token on each request
    */
   server.addHook('preHandler', (request, _reply, done) => {
-
-    console.log('preHandler hood triggered');
-
     const authorizationHeader = request.headers.authorization;
 
     if (notEmpty(authorizationHeader)) {
