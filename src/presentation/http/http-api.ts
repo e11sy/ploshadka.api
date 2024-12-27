@@ -12,6 +12,7 @@ import AuthRouter from '@presentation/http/router/auth.js';
 import UserRouter from './router/user.js';
 import OauthRouter from './router/oauth.js';
 import EventsRouter from './router/events.js';
+import CourtsRouter from './router/courts.js';
 import { RequestParams, Response } from '@presentation/api.interface.js';
 import Policies from './policies/index.js';
 import addUserIdResolver from './middlewares/common/userIdResolver.js';
@@ -49,6 +50,11 @@ export default class HttpApi implements Api {
     await this.server?.register(EventsRouter, {
       prefix: '/events',
       eventService: domainServices.eventsService,
+    });
+
+    await this.server?.register(CourtsRouter, {
+      prefix: '/courts',
+      courtsService: domainServices.courtsService,
     });
 
     await this.server?.register(OauthRouter, {
