@@ -3,6 +3,7 @@ import AuthService from './service/auth.js';
 import UserService from './service/user.js'
 import EventsService from './service/events.js'
 import type { AppConfig } from '@infrastructure/config/index.js';
+import CourtsService from './service/courts.js';
 
 export interface DomainServices {
   eventsService: EventsService;
@@ -10,6 +11,8 @@ export interface DomainServices {
   userService: UserService;
 
   authService: AuthService;
+
+  courtsService: CourtsService;
 };
 
 /**
@@ -27,10 +30,12 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     appConfig.auth.refreshExpiresIn,
     repositories.userSessionRepository
   );
+  const courtsService = new CourtsService(repositories.courtsRepository);
 
   return {
     eventsService,
     userService,
     authService,
+    courtsService,
   }
 }
